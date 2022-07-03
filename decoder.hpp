@@ -26,10 +26,10 @@ namespace Cristiano {
     };
     struct instruction{
         int rs1=-1;int rs2=-1;int rd=-1;
-        im immediate={-1,0};opcode op=end;int shamt=-1;codeType type;
+        im immediate={-1,0};opcode op=end;int shamt=1;codeType type;
         int PC=-1;
         instruction(){
-            rs1=rs2=rd=0;immediate={0,0};shamt=0;
+            rs1=rs2=rd=0;immediate={0,0};shamt=1;
             op=add;
         }
         instruction(const int& r1,const int& r2,int d,im imm,opcode oc):rs1(r1),rs2(r2),rd(d),immediate(imm),op(oc){};
@@ -199,7 +199,7 @@ namespace Cristiano {
                 if (fun == "110")command = ori;
                 if (fun == "111")command = andi;
                 if (fun == "001"){
-                    int shamt=btoi(order.substr(7,5));command = slli;
+                    shamt=btoi(order.substr(7,5));command = slli;
                 }
                 if (fun == "101") {
                     if (order[1] == '1')command = srai;
