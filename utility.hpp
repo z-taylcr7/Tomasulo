@@ -43,16 +43,16 @@ namespace Cristiano{
         }
         return x;
     }
-    std::string decToBin(uint u){
+    std::string decToBin(unsigned int u){
         std::string str;
         while(u>0){
             int a=u&1;u=u>>1;char ch='0';
             if(a)ch='0'+a;
-            str+=ch;
+            str=ch+str;
         }
         int l=str.length();
-        for(int i=0;i<32-l;i++)str+='0';
-        return reverse(str);
+        for(int i=0;i<32-l;i++)str='0'+str;
+        return str;
     }
     std::string decToHex(int u){
         std::string str;

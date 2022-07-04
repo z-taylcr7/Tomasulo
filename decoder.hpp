@@ -13,7 +13,7 @@ namespace Cristiano {
     uint pc=0;
     uint last=0;
     enum codeType {
-        U, J, I, B, S, R
+        U, J, I, B, S, R,E
     };
     enum opcode {
         add, sub, sll, slt, sltu, Xor, srl, sra, Or, And,//R
@@ -30,7 +30,7 @@ namespace Cristiano {
         int PC=-1;
         instruction(){
             rs1=rs2=rd=0;immediate={0,0};shamt=1;
-            op=add;
+            op=end;
         }
         instruction(const int& r1,const int& r2,int d,im imm,opcode oc):rs1(r1),rs2(r2),rd(d),immediate(imm),op(oc){};
 
@@ -77,13 +77,14 @@ namespace Cristiano {
     }counter[COUNTER];
 
     struct ROB_Node{
-        bool has_value;
+        bool has_value,isJump,isStore;
         uint value;
         int pc_predict,pc_now,pc_prev;
         instruction ins;
         int dest,index;
-        bool ready;
-        int counter;
+
+        ROB_Node():has_value(0),isJump(0){}
+
 
     };
     struct RS_Node{
@@ -148,7 +149,7 @@ namespace Cristiano {
         if (o == "1100011")return B;
         if (o == "0100011")return S;
         if (o == "0110011")return R;
-        return R;
+        return E;
     };
     instruction Rdecode(const std::string &order) {
         int rd = btoi(order.substr(20, 5));
@@ -613,8 +614,9 @@ namespace Cristiano {
         return x;
     }
     int fetchCode(int pos,std::string& ord) {//end return false
+        uint p= readMemory(pos);
+        ord=decToBin(p);
         if(pc>last)return -1;
-        ord= decToBin(readMemory(pos));
         if(ord=="00001111111100000000010100010011")return 1;
         return 0;
     }

@@ -14,7 +14,7 @@ namespace Cristiano {
     int lb_entry_tag;
     const int QUEUE_SIZE = 32;
     const int mem_size = 4194304;
-    
+
     unsigned int mem[mem_size];
 
 
@@ -55,7 +55,7 @@ namespace Cristiano {
                 instruction ins;
                 int pc_n;
             }queue[32];
-          int head,tail;
+            int head,tail;
 
         public:
             int size=0;
@@ -302,7 +302,7 @@ namespace Cristiano {
             //regfile
             rs_stall=false,rob_stall=false,slb_stall=false;
 
-           //inst_fetch_and_queue
+            //inst_fetch_and_queue
             new_is_to_ex = false;
             is_to_ex = false;
             tmsl_reserve = false;
@@ -362,7 +362,7 @@ namespace Cristiano {
 
                 run_rob();
                 if(rob_to_commit.PC==8||
-                rob_to_commit.op==lui&&rob_to_commit.immediate.value==255&&rob_to_commit.rd==0){
+                   rob_to_commit.op==lui&&rob_to_commit.immediate.value==255&&rob_to_commit.rd==0){
                     std::cout << std::dec << ((unsigned int)reg_prev[10] & 255u);
                     break;
                 }
@@ -374,7 +374,7 @@ namespace Cristiano {
                 run_issue();
                 run_ex();
                 run_commit();
-                //showReg();
+                showReg();
                 //if(cycle%100000==0)std::cout<<cycle<<std::endl;
             }
         }
@@ -403,7 +403,7 @@ namespace Cristiano {
                 pc_next=pc+sext(i.immediate.value,i.immediate.height);
             }else if (i.type == B) {
                 pc_next= (predictTable[pc][history[pc]] >= 2) ? pc + i.immediate.value : pc + 4;
-                } else pc_next = pc + 4;
+            } else pc_next = pc + 4;
             i.PC=pc;
             IFQueueNext.enQueue(i,pc_next);
         }
@@ -414,9 +414,11 @@ namespace Cristiano {
             isReturn.available=false;
             if(IFQueuePrev.size>0&&!rob_stall){
                 instruction p=IFQueuePrev.top().ins;
-                //if(p.PC>last)return;
-                isReturn.available= true;
                 tmsl_fetch=true;
+                isReturn.gotoSLB=isReturn.gotoRS=false;
+                bool illegal=(p.type==E||p.op==end);
+                if(illegal)return;
+                isReturn.available= true;
                 int posrob=rob.getTail();
                 if(p.rd!=-1&&p.rd!=0){
                     channel.rd_issue=p.rd;
@@ -649,7 +651,7 @@ namespace Cristiano {
                 SLB_Node &tmp=slb.preQue.top();
                 if(tmp.ready()){
                     tmp.count++;
-                    if(tmp.count>=1){
+                    if(tmp.count==3){
                         ALU alu(tmp.node.ins);
                         alu.execute(tmp.node.V1,tmp.node.V2);
                         if(tmp.type==S){
