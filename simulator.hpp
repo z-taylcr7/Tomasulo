@@ -374,7 +374,7 @@ namespace Cristiano {
                 run_issue();
                 run_ex();
                 run_commit();
-                showReg();
+                //showReg();
                 //if(cycle%100000==0)std::cout<<cycle<<std::endl;
             }
         }
